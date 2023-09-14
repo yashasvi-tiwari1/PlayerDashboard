@@ -8,8 +8,10 @@ import {
   IconUserSquare,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 export default function Sidebar() {
+  const navigate = useRouter();
   return (
     <div className="w-52 z-10 fixed inset-y-0 bg-dashboard">
       <div className="p-6">
@@ -19,7 +21,8 @@ export default function Sidebar() {
             alt="logo"
             height={220}
             width={220}
-            className="h-28 w-28"
+            className="h-28 w-28 cursor-pointer"
+            onClick={() => navigate.push("/")}
           />
           <div className="-mt-4">
             <span className="font-semibold text-lg ml-4 ">Yarsa Play</span>

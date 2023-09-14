@@ -16,13 +16,17 @@ const Pagination = ({
     pages.push(i);
   }
   return (
-    <div className="bottom-0">
+    <div className="bottom-0 flex justify-center items-center">
       {pages.map((page, index) => {
         return (
           <button
             key={index}
             onClick={() => setCurrentPage(page)}
-            className={page == currentPage ? "active" : ""}
+            className={
+              page == currentPage
+                ? "active bg-yellow-500 p-3 text-white"
+                : "bg-black text-white p-3"
+            }
           >
             {page}
           </button>

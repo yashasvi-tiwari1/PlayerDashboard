@@ -3,11 +3,10 @@ import { IconEye, IconEyeOff } from "@tabler/icons-react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import { BASEURL } from "play/pages/api/api";
 import { NextPageWithLayout } from "play/pages/_app";
 import Layout from "play/components/layout";
 import { toast } from "react-toastify";
+import { api } from "play/helpers/api";
 
 interface FormData {
   name: string;
@@ -70,10 +69,11 @@ const CreateUser: NextPageWithLayout = () => {
       password: data.password,
       role: data.role,
     };
-    axios
-      .post(`${BASEURL}/user`, userData)
+    api
+      .post(`/user`, userData)
       .then((response) => {
-        toast.success(response.data.message);
+        console.log(response.data);
+        toast.success(response?.data?.message);
       })
       .catch((error) => {
         toast.error(error.response.message);
@@ -85,7 +85,7 @@ const CreateUser: NextPageWithLayout = () => {
   return (
     <div className="flex justify-center ">
       <div className=" p-20 w-[600px] drop-shadow-xl">
-        <div className=" p-2 text-center  font-bold text-lg tracking-wider cursor-pointer rounded-tl-xl bg-teal-400 text-white cursor-pointer">
+        <div className=" p-2 text-center  font-bold text-lg tracking-wider  rounded-tl-xl bg-teal-400 text-white cursor-pointer">
           <span className="text-2xl">User Form </span>
         </div>
         <div className="bg-white p-10 rounded-b-xl">

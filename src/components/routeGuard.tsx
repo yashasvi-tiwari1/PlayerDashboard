@@ -1,0 +1,47 @@
+// import { useRouter } from "next/router";
+// import { useEffect, useState } from "react";
+//
+// function RouteGuard({ children }) {
+//   const router = useRouter();
+//   const [authorized, setAuthorized] = useState(false);
+//
+//   useEffect(() => {
+//     authCheck(router.asPath);
+//
+//     // on route change start - hide page content by setting authorized to false
+//
+//     const hideContent = () => setAuthorized(false);
+//     router.events.on("routeChangeStart", hideContent);
+//
+//     //on route change start -  hide page content by setting authorized to false
+//     router.events.on("routeChangeComplete", authCheck);
+//
+//     //unsubscribe from events in useEffect return function
+//     return () => {
+//       router.events.off("routeChangeStart", hideContent);
+//       router.events.off("routeChangeComplete", authCheck);
+//     };
+//
+//     //eslint-disable-next-line react hooks/exhaustive-deps
+//   }, []);
+//
+//   function authCheck(url) {
+//     //redirect to login page if accessing a private page not logged in
+//
+//     const publicPaths = ["/login"];
+//     const path = url.split("?")[0];
+//     if (!userService.userValue && !publicPaths.include(path)) {
+//       setAuthorized(false);
+//       router.push({
+//         pathname: "/login",
+//         query: { returnUrl: router.asPath },
+//       });
+//     } else {
+//       setAuthorized(true);
+//     }
+//   }
+//
+//   return authorized && children;
+// }
+//
+// export default RouteGuard;

@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { ReactElement, useEffect, useState } from "react";
 import { IconEye, IconEyeOff } from "@tabler/icons-react";
-import Link from "next/link";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { api } from "play/helpers/api";
+import { NextPageWithLayout } from "play/pages/_app";
+import Layout from "play/components/layout";
 import { toast } from "react-toastify";
+import { api } from "play/helpers/api";
 import { useRouter } from "next/router";
 
 interface FormData {
@@ -13,14 +14,16 @@ interface FormData {
   email: string;
   password: string;
   confirmPassword: string;
+  role: string;
 }
 
-function SignUp() {
+const UpdateUser: NextPageWithLayout = () => {
   const [data, setData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
+    role: "",
   });
   const validationSchema = z
     .object({
@@ -39,6 +42,7 @@ function SignUp() {
         .min(1, "Confirm password is required")
         .min(6, { message: "Password must be at least 6 characters " })
         .max(20),
+      role: z.string(),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: "Passwords do not match",
@@ -59,32 +63,45 @@ function SignUp() {
     });
   };
   const navigate = useRouter();
+  const { id } = navigate.query;
+  useEffect(() => {
+    api
+      .get(`/user/` + id)
+      .then((response) => {
+        console.log(response.data);
+        setData(response.data);
+      })
+      .catch((error) => {
+        toast.error(error.response.message);
+      });
+  }, []);
+  console.log(data);
   const formSumbit = (formData: FormData, e: any) => {
     e.preventDefault();
     const userData = {
       name: data.name,
       email: data.email,
       password: data.password,
+      role: data.role,
     };
     api
-      .post(`/player`, userData)
+      .put(`/user/${id}`, userData)
       .then((response) => {
-        setData(response.data);
+        navigate.push("/user");
         toast.success(response.data.message);
-        navigate.push("/playerPage");
       })
       .catch((error) => {
-        alert(error.response.message);
+        toast.error(error.response.message);
       });
   };
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   return (
-    <div className="flex justify-center bg-gray-300 ">
+    <div className="flex justify-center ">
       <div className=" p-20 w-[600px] drop-shadow-xl">
-        <div className=" p-2 text-center  font-bold text-lg tracking-wider cursor-pointer rounded-tl-xl bg-teal-400 text-white">
-          <span className="text-2xl">Player Form </span>
+        <div className=" p-2 text-center  font-bold text-lg tracking-wider  rounded-tl-xl bg-teal-400 text-white cursor-pointer">
+          <span className="text-2xl">User Update Form </span>
         </div>
         <div className="bg-white p-10 rounded-b-xl">
           <p className="font-bold text-2xl text-center text-gray-900 mb-10">
@@ -164,27 +181,42 @@ function SignUp() {
                 </button>
               </div>
             </div>
-
+            <div className="mb-5 w-full">
+              <select
+                className="border p-3 focus:ring focus:outline-none focus:ring-teal-200 focus:opacity-50 rounded w-full cursor-pointer"
+                {...register("role")}
+                value={data.role}
+                onChange={handleChange}
+              >
+                <option value="" disabled selected>
+                  Select Role
+                </option>
+                <option value="admin" className="cursor-pointer">
+                  Admin
+                </option>
+                <option value="staff" className="cursor-pointer">
+                  Staff
+                </option>
+              </select>
+              {errors.role && <span>{errors.role.message}</span>}
+            </div>
             <div className="mb-2">
               <button
                 type="submit"
                 className="bg-teal-500 w-full hover:bg-teal-700 text-white py-2 px-6 rounded font-semibold tracking-wider"
               >
                 {" "}
-                Create An Account
+                UPDATE USER
               </button>
-            </div>
-            <div className="text-center text-sm already">
-              <span className="text-black">Already have an account? </span>
-              <Link href={"/playerLogin"} className="font-bold text-blue-600">
-                Login
-              </Link>
             </div>
           </form>
         </div>
       </div>
     </div>
   );
-}
+};
+UpdateUser.getLayout = function getLayout(page: ReactElement) {
+  return <Layout>{page}</Layout>;
+};
 
-export default SignUp;
+export default UpdateUser;

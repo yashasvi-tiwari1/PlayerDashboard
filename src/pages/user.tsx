@@ -1,10 +1,11 @@
-import { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useCallback, useEffect, useState } from "react";
 import { IconEdit, IconSearch, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/router";
 import Layout from "play/components/layout";
 import { NextPageWithLayout } from "play/pages/_app";
 import { BASEURL } from "play/pages/api/api";
-import axios from "axios";
+import { toast } from "react-toastify";
+import { api } from "play/helpers/api";
 
 interface user {
   id: string;
@@ -16,33 +17,46 @@ interface user {
 
 const User: NextPageWithLayout = () => {
   const [users, setUsers] = useState<user[]>([]);
-  useEffect(() => {
-    axios
-      .get(`${BASEURL}/user`)
+
+  const fetchUser = useCallback(() => {
+    api
+      .get(`/user`)
       .then((response) => {
         setUsers(response.data);
       })
       .catch((error) => {
-        alert(error.response.message);
+        toast.error(error.response.data.message);
       });
   }, [BASEURL]);
 
+  useEffect(() => {
+    fetchUser();
+  }, []);
   const router = useRouter();
-  const handleEdit = (userId: string) => {
-    router.push("/signup");
+  const handleEdit = (id: string) => {
+    router.push({ pathname: "/updateUser", query: { id: id } });
   };
-  const handleDelete = (userId: string) => {
-    console.log(`delete user ${userId}`);
+  const handleDelete = (id: string) => {
+    api
+      .delete(`/user/${id}`)
+      .then((response) => {
+        fetchUser();
+        toast.success(response.data.message, { position: "bottom-center" });
+      })
+      .catch((err) => {
+        toast.error(err.response.data.message);
+      });
   };
-
   return (
     <>
       <div className="bg-dashboard  p-4 rounded-lg">
         <div className="flex justify-between  items-center px-4  ">
           <div className="flex items-center gap-6">
-            <span>Total Users: 100 </span>
+            <span className="font-semibold text-lg">
+              Total Users: {users.length}{" "}
+            </span>
             <div
-              className=" py-2 px-4 rounded-lg space-x-4 mb-2 bg-teal-500"
+              className=" py-2 px-4 rounded-lg space-x-4 mb-2 bg-teal-500 cursor-pointer"
               onClick={() => router.push("/createUser")}
             >
               Add Users
@@ -51,7 +65,7 @@ const User: NextPageWithLayout = () => {
           <div className="relative user-search">
             <input
               type="search"
-              placeholder="Search services ..."
+              placeholder="Search user ..."
               className="p-2 border rounded-lg px-12 "
             />
             <IconSearch className="absolute -mt-8  ml-3 text-gray-500" />
@@ -64,7 +78,6 @@ const User: NextPageWithLayout = () => {
                 <th className="px-4 py-2">ID</th>
                 <th className="border px-4 py-2">Name</th>
                 <th className="border px-4 py-2">Email</th>
-                <th className="border px-4 py-2">Contact</th>
                 <th className="border px-4 py-2">Role</th>
                 <th className="border px-4 py-2">Edit</th>
                 <th className="border px-4 py-2">Delete</th>
@@ -72,12 +85,11 @@ const User: NextPageWithLayout = () => {
             </thead>
             {users.length > 0 && (
               <tbody>
-                {users.map((user) => (
+                {users.map((user, index) => (
                   <tr key={user.id}>
                     <td className="border px-4 py-2"> {user.id} </td>
                     <td className="border px-4 py-2"> {user.name}</td>
                     <td className="border px-4 py-2"> {user.email}</td>
-                    <td className="border px-4 py-2"> {user.contact}</td>
                     <td className="border px-4 py-2"> {user.role}</td>
                     <td className="border px-4 py-2">
                       <IconEdit

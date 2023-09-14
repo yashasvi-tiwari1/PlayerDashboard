@@ -27,7 +27,7 @@ const validationSchema = z.object({
     .max(20),
 });
 
-const Login = () => {
+const PlayerLogin = () => {
   const [data, setData] = useState({
     email: "",
     password: "",
@@ -42,17 +42,16 @@ const Login = () => {
   });
   const navigate = useRouter();
   const setLoginData = (data: {
-    role: string;
     accessToken: string;
     refreshToken: string;
     name: string;
     id: string;
   }) => {
-    localStorage.setItem("userInfo", JSON.stringify(data));
+    localStorage.setItem("playerInfo", JSON.stringify(data));
     navigate.push({
-      pathname: "/",
+      pathname: "/playerPage",
       query: {
-        name: data.name,
+        id: data.id,
       },
     });
     toast.success(`Welcome ${data.name}`);
@@ -73,22 +72,22 @@ const Login = () => {
       password: data.password,
     };
     try {
-      const response = await api.post(`/user/login`, userData, {});
+      const response = await api.post(`/player`, userData, {});
       setLoginData(response.data);
       const { accessToken, refreshToken } = response.data;
       saveTokens(accessToken, refreshToken);
+      navigate.push("/playerPage");
     } catch (err: any) {
       toast.error(err.response.data.message);
     }
   };
 
-  const router = useRouter();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   return (
     <div className="bg-gray-300 flex justify-center h-screen">
       <div className="py-10 px-20 w-[600px] justify-center drop-shadow-xl ">
         <div className="bg-teal-500 p-3 text-white text-center font-bold text-xl rounded-t-lg">
-          <span>USER LOGIN</span>
+          <span>PLAYER LOGIN</span>
         </div>
         <div className="bg-white px-6 py-10 rounded-b-lg">
           <div className="flex justify-center mb-8">
@@ -167,8 +166,8 @@ const Login = () => {
           </div>
           <div className="-mt-5  py-1 px-2 flex gap-2  text-right  float-right text-gray-700 ">
             <span> Not a member?</span>
-            <Link href="/" className="font-semibold ">
-              <u>Contact Admin</u>{" "}
+            <Link href="/signup" className="font-semibold ">
+              <u>Sign Up Now</u>{" "}
             </Link>
           </div>
         </div>
@@ -176,4 +175,4 @@ const Login = () => {
     </div>
   );
 };
-export default Login;
+export default PlayerLogin;
