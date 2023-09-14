@@ -24,9 +24,10 @@ export function removeTokens() {
 
 export function removeLoginInfo() {
   removeTokens();
-  localStorage.removeItem("name");
-  localStorage.removeItem("id");
-  localStorage.removeItem("role");
+  localStorage.removeItem("userInfo");
+  // localStorage.removeItem("name");
+  // localStorage.removeItem("id");
+  // localStorage.removeItem("role");
 }
 
 api.interceptors.request.use(

@@ -6,6 +6,7 @@ import { NextPageWithLayout } from "play/pages/_app";
 import { BASEURL } from "play/pages/api/api";
 import { toast } from "react-toastify";
 import { api } from "play/helpers/api";
+import { list } from "postcss";
 
 interface user {
   id: string;
@@ -17,6 +18,7 @@ interface user {
 
 const User: NextPageWithLayout = () => {
   const [users, setUsers] = useState<user[]>([]);
+  const [search, setSearch] = useState<user[]>(users);
 
   const fetchUser = useCallback(() => {
     api
@@ -32,6 +34,11 @@ const User: NextPageWithLayout = () => {
   useEffect(() => {
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    setSearch(users);
+  }, [users]);
+
   const router = useRouter();
   const handleEdit = (id: string) => {
     router.push({ pathname: "/updateUser", query: { id: id } });
@@ -46,6 +53,16 @@ const User: NextPageWithLayout = () => {
       .catch((err) => {
         toast.error(err.response.data.message);
       });
+  };
+
+  const handleSearch = (e: any) => {
+    setSearch(
+      users.filter((list) =>
+        e.target.value !== " "
+          ? list.name.toLowerCase().startsWith(e.target.value)
+          : list
+      )
+    );
   };
   return (
     <>
@@ -67,6 +84,7 @@ const User: NextPageWithLayout = () => {
               type="search"
               placeholder="Search user ..."
               className="p-2 border rounded-lg px-12 "
+              onChange={handleSearch}
             />
             <IconSearch className="absolute -mt-8  ml-3 text-gray-500" />
           </div>
@@ -85,7 +103,7 @@ const User: NextPageWithLayout = () => {
             </thead>
             {users.length > 0 && (
               <tbody>
-                {users.map((user, index) => (
+                {search.map((user, index) => (
                   <tr key={user.id}>
                     <td className="border px-4 py-2"> {user.id} </td>
                     <td className="border px-4 py-2"> {user.name}</td>

@@ -12,8 +12,6 @@ import { useRouter } from "next/router";
 interface FormData {
   name: string;
   email: string;
-  password: string;
-  confirmPassword: string;
   role: string;
 }
 
@@ -21,33 +19,16 @@ const UpdateUser: NextPageWithLayout = () => {
   const [data, setData] = useState({
     name: "",
     email: "",
-    password: "",
-    confirmPassword: "",
     role: "",
   });
-  const validationSchema = z
-    .object({
-      name: z.string().min(1, { message: "Full name is required" }).max(60),
-      email: z
-        .string()
-        .email({ message: "Invalid email format" })
-        .min(1, { message: "Email is required" }),
-      password: z
-        .string()
-        .min(1, { message: "Password is required" })
-        .min(6, { message: "password must be at least 6 characters " })
-        .max(20),
-      confirmPassword: z
-        .string()
-        .min(1, "Confirm password is required")
-        .min(6, { message: "Password must be at least 6 characters " })
-        .max(20),
-      role: z.string(),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: "Passwords do not match",
-      path: ["confirmPassword", "password"],
-    });
+  const validationSchema = z.object({
+    name: z.string().min(1, { message: "Full name is required" }).max(60),
+    email: z
+      .string()
+      .email({ message: "Invalid email format" })
+      .min(1, { message: "Email is required" }),
+    role: z.string(),
+  });
   const {
     register,
     handleSubmit,
@@ -131,55 +112,6 @@ const UpdateUser: NextPageWithLayout = () => {
               />
 
               {errors.email && <span>{errors.email.message}</span>}
-            </div>
-            <div className="mb-5 w-full">
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Password"
-                  className="border p-3 focus:ring focus:ring-teal-200 focus:outline-none focus:opacity-50 rounded w-full"
-                  {...register("password")}
-                  value={data.password}
-                  onChange={handleChange}
-                />
-                {errors.password && <span>{errors.password.message}</span>}
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center focus:outline-none"
-                >
-                  {showPassword ? (
-                    <IconEye className="h-5 w-5 text-gray-500" />
-                  ) : (
-                    <IconEyeOff className="h-5 w-5 text-gray-500" />
-                  )}
-                </button>
-              </div>
-            </div>
-            <div className="mb-5 w-full">
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Confirm Password"
-                  className="border p-3 focus:ring focus:ring-teal-200 focus:outline-none focus:opacity-50 rounded w-full"
-                  {...register("confirmPassword")}
-                />
-                {errors.confirmPassword && (
-                  <span>{errors.confirmPassword.message}</span>
-                )}
-
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center focus:outline-none"
-                >
-                  {showPassword ? (
-                    <IconEye className="h-5 w-5 text-gray-500" />
-                  ) : (
-                    <IconEyeOff className="h-5 w-5 text-gray-500" />
-                  )}
-                </button>
-              </div>
             </div>
             <div className="mb-5 w-full">
               <select

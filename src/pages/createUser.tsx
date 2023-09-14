@@ -7,6 +7,7 @@ import { NextPageWithLayout } from "play/pages/_app";
 import Layout from "play/components/layout";
 import { toast } from "react-toastify";
 import { api } from "play/helpers/api";
+import { useRouter } from "next/router";
 
 interface FormData {
   name: string;
@@ -61,6 +62,7 @@ const CreateUser: NextPageWithLayout = () => {
       [e.target.name]: value,
     });
   };
+  const navigate = useRouter();
   const formSumbit = (formData: FormData, e: any) => {
     e.preventDefault();
     const userData = {
@@ -74,6 +76,7 @@ const CreateUser: NextPageWithLayout = () => {
       .then((response) => {
         console.log(response.data);
         toast.success(response?.data?.message);
+        navigate.push("/user");
       })
       .catch((error) => {
         toast.error(error.response.message);
